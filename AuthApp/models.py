@@ -2,11 +2,17 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.conf import settings
+import calendar
+import time
 
 
 # Custom user manager
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, first_name, last_name, date_of_birth, email, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -19,6 +25,10 @@ class MyUserManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.date_of_birth = date_of_birth
+        user.created_on = calendar.timegm(time.gmtime())
         user.save(using=self._db)
         return user
 
@@ -45,7 +55,7 @@ class MyUserAccount(AbstractBaseUser):
     date_of_birth = models.CharField(verbose_name='Date of Birth', max_length=100, null=True)
     created_on = models.CharField(verbose_name='Join Date', max_length=100, null=True)
     updated_on = models.CharField(verbose_name='Update Date', max_length=100, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_delete = models.BooleanField(default=False)
@@ -67,3 +77,20 @@ class MyUserAccount(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
+
+# email handler table
+class emailHandler(models.Model):
+    subject = models.CharField(max_length=255)
+    email = models.EmailField()
+    body = models.TextField()
+    is_sent = models.BooleanField(default=False)
+    created_on = models.CharField(max_length=40)
+    updated_on = models.CharField(max_length=40)
+
