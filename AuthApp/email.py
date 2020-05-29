@@ -1,15 +1,10 @@
 from .models import *
 from .serializers import *
-from .generateToken import *
-from .generateToken import *
-from django.http import HttpResponse, JsonResponse
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 import calendar
 import time
+import threading
 import random as r
 
 
@@ -39,7 +34,46 @@ class emailSendService:
         email.token = token
         email.created_on = calendar.timegm(time.gmtime())
         saved = email.save()
-        to_email = user
-        # email = EmailMessage(mail_subject, message, to=[to_email])
-        # is_sent = email.send()
         return saved
+
+    def sendEmail(self, email, subject, body):
+        print('send email method called', email, subject, body)
+        mail = EmailMessage(subject, body, to=[email])
+        is_sent = mail.send()
+        if is_sent:
+            emailObj = emailHandler.objects.get(email_id=email)
+            emailObj.is_sent = True
+            emailObj.sent_on = calendar.timegm(time.gmtime())
+            emailObj.updated_on = calendar.timegm(time.gmtime())
+            emailObj.retry_count += 1
+            emailObj.save()
+        else:
+            emailObj = emailHandler.objects.get(email_id=email)
+            emailObj.is_sent = False
+            emailObj.sent_on = calendar.timegm(time.gmtime())
+            emailObj.updated_on = calendar.timegm(time.gmtime())
+            emailObj.retry_count += 1
+            emailObj.save()
+        return is_sent
+
+    def getEmailData(self):
+        emails = emailHandler.objects.filter(is_sent=False, retry_count__lt=10)
+        print('emails ::', emails)
+        for email in emails:
+            print('email :: ', email.email_id)
+            print('subject :: ', email.subject)
+            print('body :: ', email.body)
+            # email = email.email_id
+            # subject = email.subject
+            # body = email.body
+            self.sendEmail(email.email_id, email.subject, email.body)
+        time.sleep(10)
+
+#
+# obj = emailSendService()
+#
+# # Created the Threads
+# t1 = threading.Thread(target=obj.getEmailData())
+#
+# # Started the threads
+# t1.start()

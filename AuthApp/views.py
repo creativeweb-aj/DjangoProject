@@ -13,6 +13,15 @@ from .serializers import *
 from .email import *
 
 
+def index(request):
+    import threading
+    obj = emailSendService()
+    t = threading.Thread(target=obj.getEmailData, args=(), kwargs={})
+    print("process started")
+    t.setDaemon(True)
+    t.start()
+    return HttpResponse("main thread content")
+
 @api_view(['POST'])
 def createUserAccount(request):
     if request.method == 'POST':
@@ -49,19 +58,10 @@ def createUserAccount(request):
         return Response(DictData, status=201)
 
 
-def activate(request, uidb64, token):
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = MyUserAccount.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, MyUserAccount.DoesNotExist):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.save()
-        login(request, user)
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
-    else:
-        return HttpResponse('Activation link is invalid!')
+@api_view(['POST'])
+def emailVerification(request):
+    pass
+
 
 @api_view(['POST'])
 def logInUser(request):
