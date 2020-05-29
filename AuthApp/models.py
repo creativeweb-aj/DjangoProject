@@ -42,6 +42,7 @@ class MyUserManager(BaseUserManager):
             password=password
         )
         user.is_admin = True
+        user.created_on = calendar.timegm(time.gmtime())
         user.save(using=self._db)
         return user
 
@@ -52,13 +53,13 @@ class MyUserAccount(AbstractBaseUser):
     last_name = models.CharField(verbose_name='Last Name', max_length=100, null=True)
     email = models.EmailField(verbose_name='Email Address', max_length=255, unique=True, )
     password = models.CharField(verbose_name='Password', max_length=100, null=True)
-    date_of_birth = models.CharField(verbose_name='Date of Birth', max_length=100, null=True)
-    created_on = models.CharField(verbose_name='Join Date', max_length=100, null=True)
-    updated_on = models.CharField(verbose_name='Update Date', max_length=100, null=True)
-    is_active = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    is_delete = models.BooleanField(default=False)
+    date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
+    created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
+    updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
+    is_active = models.BooleanField(default=False, null=True)
+    is_staff = models.BooleanField(default=False, null=True)
+    is_admin = models.BooleanField(default=False, null=True)
+    is_delete = models.BooleanField(default=False, null=True)
 
     objects = MyUserManager()
 
@@ -87,10 +88,17 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 # email handler table
 class emailHandler(models.Model):
-    subject = models.CharField(max_length=255)
-    email = models.EmailField()
-    body = models.TextField()
-    is_sent = models.BooleanField(default=False)
-    created_on = models.CharField(max_length=40)
-    updated_on = models.CharField(max_length=40)
+    user = models.ForeignKey(MyUserAccount, verbose_name='user id', on_delete=models.CASCADE)
+    subject = models.CharField(verbose_name='Subject', max_length=255)
+    email_id = models.EmailField(verbose_name='Email address', null=True)
+    body = models.TextField(verbose_name='Body', null=True)
+    token = models.BigIntegerField(verbose_name='Token', null=True)
+    is_sent = models.BooleanField(verbose_name='Is sent', default=False, null=True)
+    is_expiry = models.BooleanField(verbose_name='Is expiry', default=False, null=True)
+    retry_count = models.BigIntegerField(verbose_name='Retry counter', null=True)
+    sent_on = models.BigIntegerField(verbose_name='Sent on', null=True)
+    created_on = models.BigIntegerField(verbose_name='Created on', null=True)
+    updated_on = models.BigIntegerField(verbose_name='Updated on', null=True)
 
+    def __str__(self):
+        return self.email_id

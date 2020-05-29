@@ -33,11 +33,9 @@ def createUserAccount(request):
             DictData['message'] = 'Email is already exist'
         else:
             user = MyUserAccount.objects.create_user(first_name, last_name, date_of_birth, email, password)
-
             emailService = emailSendService()
-            is_sent = emailService.sendEmail(user)
-            if is_sent:
-                print('is_sent', is_sent)
+            is_save = emailService.saveEmail(user)
+            if is_save:
                 serializer = MyUserAccountSerializer(user)
                 token = Token.objects.get(user_id=user)
                 DictData['status'] = 'SUCCESS'
