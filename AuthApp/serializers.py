@@ -6,7 +6,7 @@ from .models import *
 class MyUserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUserAccount
-        fields = ['first_name', 'last_name', 'email', 'date_of_birth', 'password']
+        fields = ['id', 'first_name', 'last_name', 'email', 'date_of_birth']
 
     def validate(self, data):
         first_name = data.get('first_name', '')
@@ -44,3 +44,5 @@ class LoginUserSerializer(serializers.Serializer):
             message = 'Must provide email and password'
             raise exceptions.ValidationError(message)
         return data
+
+

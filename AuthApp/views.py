@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,15 +11,6 @@ from .models import *
 from .serializers import *
 from .email import *
 
-
-def index(request):
-    import threading
-    obj = emailSendService()
-    t = threading.Thread(target=obj.getEmailData, args=(), kwargs={})
-    print("process started")
-    t.setDaemon(True)
-    t.start()
-    return HttpResponse("main thread content")
 
 @api_view(['POST'])
 def createUserAccount(request):
@@ -43,24 +33,81 @@ def createUserAccount(request):
         else:
             user = MyUserAccount.objects.create_user(first_name, last_name, date_of_birth, email, password)
             emailService = emailSendService()
-            is_save = emailService.saveEmail(user)
-            if is_save:
-                serializer = MyUserAccountSerializer(user)
-                token = Token.objects.get(user_id=user)
-                DictData['status'] = 'SUCCESS'
-                DictData['response'] = serializer.data
-                DictData['response']['token'] = token.key
-                DictData['message'] = 'User created successfully'
-            else:
-                DictData['status'] = 'FAIL'
-                DictData['response'] = ''
-                DictData['message'] = 'Email is not sent'
+            emailService.saveEmail(user)
+            serializer = MyUserAccountSerializer(user)
+            # token = Token.objects.get(user_id=user)
+            DictData['status'] = 'SUCCESS'
+            DictData['response'] = serializer.data
+            DictData['message'] = 'User created, Please verify email to login'
         return Response(DictData, status=201)
 
 
 @api_view(['POST'])
+def getUserById(request):
+    if request.method == 'POST':
+        userId = request.data['userId']
+        user = MyUserAccount.objects.get(id=userId)
+        DictData = {}
+        if user:
+            serializer = MyUserAccountSerializer(user)
+            DictData['status'] = 'SUCCESS'
+            DictData['response'] = serializer.data
+            DictData['message'] = 'User data send'
+            return Response(DictData, status=200)
+        else:
+            DictData['status'] = 'FAIL'
+            DictData['response'] = ''
+            DictData['message'] = 'User not found'
+            return Response(DictData, status=404)
+
+
+@api_view(['POST'])
 def emailVerification(request):
-    pass
+    if request.method == 'POST':
+        print(request.data)
+        emailId = request.data['emailId']
+        otp = request.data['otp']
+        currentTime = calendar.timegm(time.gmtime())
+        DictData = {}
+        if emailId and otp:
+            emailData = emailHandler.objects.get(email_id=emailId, is_sent=True, is_verify=False)
+            print('email data from table :: ', emailData)
+            print('email data from table is expiry :: ', emailData.is_expiry)
+            expiredDate = emailData.is_expiry - currentTime
+            expiredDate = expiredDate / 60
+            print('expired date :: ', expiredDate)
+            if int(expiredDate) < 1440:
+                if emailData.token == int(otp):
+                    emailData.is_verify = True
+                    emailData.updated_on = calendar.timegm(time.gmtime())
+                    emailData.save()
+                    userData = MyUserAccount.objects.get(email=emailId)
+                    userData.is_active = True
+                    userData.updated_on = calendar.timegm(time.gmtime())
+                    userData.save()
+                    DictData['status'] = 'SUCCESS'
+                    DictData['response'] = ''
+                    DictData['message'] = 'Email verified successfully'
+                    return Response(DictData, status=200)
+                else:
+                    emailData.updated_on = calendar.timegm(time.gmtime())
+                    emailData.save()
+                    DictData['status'] = 'FAIL'
+                    DictData['response'] = ''
+                    DictData['message'] = 'Please enter correct OTP'
+                    return Response(DictData, status=203)
+            else:
+                emailData.updated_on = calendar.timegm(time.gmtime())
+                emailData.save()
+                DictData['status'] = 'FAIL'
+                DictData['response'] = ''
+                DictData['message'] = 'OTP is expired'
+                return Response(DictData, status=406)
+        else:
+            DictData['status'] = 'FAIL'
+            DictData['response'] = ''
+            DictData['message'] = 'Please enter OTP then send'
+            return Response(DictData, status=406)
 
 
 @api_view(['POST'])
@@ -79,7 +126,7 @@ def logInUser(request):
         return Response(DictData, status=200)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 def logOutUser(request):
     logout(request)

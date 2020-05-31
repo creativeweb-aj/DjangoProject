@@ -94,6 +94,7 @@ class emailHandler(models.Model):
     body = models.TextField(verbose_name='Body', null=True)
     token = models.BigIntegerField(verbose_name='Token', null=True)
     is_sent = models.BooleanField(verbose_name='Is sent', default=False, null=True)
+    is_verify = models.BooleanField(verbose_name='Is verify', default=False, null=True)
     retry_count = models.IntegerField(verbose_name='Retry counter', default=0, null=True)
     is_expiry = models.BigIntegerField(verbose_name='Is expiry', null=True)
     sent_on = models.BigIntegerField(verbose_name='Sent on', null=True)
