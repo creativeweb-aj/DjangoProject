@@ -2,11 +2,17 @@ from django.db import models
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.conf import settings
+import calendar
+import time
 
 
 # Custom user manager
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, first_name, last_name, date_of_birth, email, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
@@ -19,6 +25,10 @@ class MyUserManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.date_of_birth = date_of_birth
+        user.created_on = calendar.timegm(time.gmtime())
         user.save(using=self._db)
         return user
 
@@ -32,6 +42,7 @@ class MyUserManager(BaseUserManager):
             password=password
         )
         user.is_admin = True
+        user.created_on = calendar.timegm(time.gmtime())
         user.save(using=self._db)
         return user
 
@@ -42,13 +53,13 @@ class MyUserAccount(AbstractBaseUser):
     last_name = models.CharField(verbose_name='Last Name', max_length=100, null=True)
     email = models.EmailField(verbose_name='Email Address', max_length=255, unique=True, )
     password = models.CharField(verbose_name='Password', max_length=100, null=True)
-    date_of_birth = models.CharField(verbose_name='Date of Birth', max_length=100, null=True)
-    created_on = models.CharField(verbose_name='Join Date', max_length=100, null=True)
-    updated_on = models.CharField(verbose_name='Update Date', max_length=100, null=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    is_delete = models.BooleanField(default=False)
+    date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
+    created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
+    updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
+    is_active = models.BooleanField(default=False, null=True)
+    is_staff = models.BooleanField(default=False, null=True)
+    is_admin = models.BooleanField(default=False, null=True)
+    is_delete = models.BooleanField(default=False, null=True)
 
     objects = MyUserManager()
 
@@ -67,3 +78,28 @@ class MyUserAccount(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
+
+# email handler table
+class emailHandler(models.Model):
+    user = models.ForeignKey(MyUserAccount, verbose_name='user id', on_delete=models.CASCADE)
+    subject = models.CharField(verbose_name='Subject', max_length=255)
+    email_id = models.EmailField(verbose_name='Email address', null=True)
+    body = models.TextField(verbose_name='Body', null=True)
+    token = models.BigIntegerField(verbose_name='Token', null=True)
+    is_sent = models.BooleanField(verbose_name='Is sent', default=False, null=True)
+    is_verify = models.BooleanField(verbose_name='Is verify', default=False, null=True)
+    retry_count = models.IntegerField(verbose_name='Retry counter', default=0, null=True)
+    is_expiry = models.BigIntegerField(verbose_name='Is expiry', null=True)
+    sent_on = models.BigIntegerField(verbose_name='Sent on', null=True)
+    created_on = models.BigIntegerField(verbose_name='Created on', null=True)
+    updated_on = models.BigIntegerField(verbose_name='Updated on', null=True)
+
+    def __str__(self):
+        return self.email_id
