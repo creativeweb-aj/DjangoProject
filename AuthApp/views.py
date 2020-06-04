@@ -10,6 +10,7 @@ from rest_framework.authentication import TokenAuthentication
 from .models import *
 from .serializers import *
 from .email import *
+from .crypto import *
 
 
 @api_view(['POST'])
@@ -36,7 +37,9 @@ def createUserAccount(request):
             emailService.saveEmail(user)
             serializer = MyUserAccountSerializer(user)
             # token = Token.objects.get(user_id=user)
+            key = encrypt(user.id)
             DictData['status'] = 'SUCCESS'
+            DictData['keyId'] = key
             DictData['response'] = serializer.data
             DictData['message'] = 'User created, Please verify email to login'
         return Response(DictData, status=201)
@@ -46,7 +49,8 @@ def createUserAccount(request):
 def getUserById(request):
     if request.method == 'POST':
         userId = request.data['userId']
-        user = MyUserAccount.objects.get(id=userId)
+        key = decrypt(userId)
+        user = MyUserAccount.objects.get(id=key)
         DictData = {}
         if user:
             serializer = MyUserAccountSerializer(user)
