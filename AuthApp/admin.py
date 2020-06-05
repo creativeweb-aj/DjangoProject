@@ -12,3 +12,5 @@ class MyUserAccountAdmin(admin.ModelAdmin):
 admin.site.register(MyUserAccount, MyUserAccountAdmin)
 
 admin.site.register(emailHandler)
+
+admin.site.register(Follow)

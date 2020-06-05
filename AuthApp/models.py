@@ -37,11 +37,16 @@ class MyUserManager(BaseUserManager):
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
-        user = self.create_user(
-            email,
-            password=password
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email)
         )
+        user.set_password(password)
+        user.is_active = True
         user.is_admin = True
+        user.is_staff = True
         user.created_on = calendar.timegm(time.gmtime())
         user.save(using=self._db)
         return user
@@ -51,8 +56,10 @@ class MyUserManager(BaseUserManager):
 class MyUserAccount(AbstractBaseUser):
     first_name = models.CharField(verbose_name='First Name', max_length=100, null=True)
     last_name = models.CharField(verbose_name='Last Name', max_length=100, null=True)
+    profile_picture = models.ImageField(upload_to='profile', null=True)
     email = models.EmailField(verbose_name='Email Address', max_length=255, unique=True, )
     password = models.CharField(verbose_name='Password', max_length=100, null=True)
+    contact = models.BigIntegerField(verbose_name='contact', null=True)
     date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
     created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
     updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
@@ -103,3 +110,14 @@ class emailHandler(models.Model):
 
     def __str__(self):
         return self.email_id
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.CASCADE)
+    following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('follower', 'following')
+
+    def __unicode__(self):
+        return u'%s follows %s' % (self.follower, self.following)
