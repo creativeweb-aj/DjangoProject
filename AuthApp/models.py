@@ -60,6 +60,8 @@ class MyUserAccount(AbstractBaseUser):
     email = models.EmailField(verbose_name='Email Address', max_length=255, unique=True, )
     password = models.CharField(verbose_name='Password', max_length=100, null=True)
     contact = models.BigIntegerField(verbose_name='contact', null=True)
+    profession = models.CharField(verbose_name='profession', max_length=255, null=True)
+    biography = models.TextField(verbose_name='bio', null=True)
     date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
     created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
     updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)

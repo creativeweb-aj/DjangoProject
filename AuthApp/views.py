@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -46,7 +47,7 @@ def createUserAccount(request):
 
 
 @api_view(['POST'])
-def getUserById(request):
+def getEmailById(request):
     if request.method == 'POST':
         userId = request.data['userId']
         key = decrypt(userId)
@@ -55,13 +56,13 @@ def getUserById(request):
         if user:
             serializer = MyUserAccountSerializer(user)
             DictData['status'] = 'SUCCESS'
-            DictData['response'] = serializer.data
-            DictData['message'] = 'User data send'
+            DictData['response'] = serializer.data.email
+            DictData['message'] = 'User email send'
             return Response(DictData, status=200)
         else:
             DictData['status'] = 'FAIL'
             DictData['response'] = ''
-            DictData['message'] = 'User not found'
+            DictData['message'] = 'User email not found'
             return Response(DictData, status=404)
 
 
@@ -136,3 +137,41 @@ def logOutUser(request):
     logout(request)
     DictData = {'status': 'SUCCESS', 'response': '', 'message': 'User logout successfully'}
     return Response(DictData, status=200)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getCurrentUserProfile(request):
+    user = request.user
+    print('user ::', user)
+    obj = MyUserAccount.objects.get(email=user)
+    DictData = {}
+    if obj:
+        serializer = MyUserAccountProfileSerializer(obj)
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = serializer.data
+        DictData['message'] = 'User data send'
+        return Response(DictData, status=200)
+    else:
+        DictData['status'] = 'FAIL'
+        DictData['response'] = ''
+        DictData['message'] = 'User data not found'
+        return Response(DictData, status=406)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+def editUserProfile(request):
+    user = request.user
+    firstName = request.data('firstName')
+    lastName = request.data('lastName')
+    profilePic = request.data('profilePic')
+    profession = request.data('profession')
+    bio = request.data('bio')
+    contact = request.data('contact')
+    DictData = {}
+    DictData['status'] = 'FAIL'
+    DictData['response'] = ''
+    DictData['message'] = 'User data not found'
+    return Response(DictData, status=406)
