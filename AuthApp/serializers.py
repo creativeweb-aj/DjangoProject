@@ -6,7 +6,7 @@ from .models import *
 class MyUserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUserAccount
-        fields = ['id', 'first_name', 'last_name', 'email', 'date_of_birth']
+        fields = ['first_name', 'last_name', 'email']
 
     def validate(self, data):
         first_name = data.get('first_name', '')
@@ -21,9 +21,6 @@ class MyUserAccountSerializer(serializers.ModelSerializer):
             user = MyUserAccount.objects.create_user(first_name, last_name, date_of_birth, email, password)
             data['user'] = user
         return data
-
-
-
 
 
 class LoginUserSerializer(serializers.Serializer):
@@ -45,4 +42,9 @@ class LoginUserSerializer(serializers.Serializer):
             raise exceptions.ValidationError(message)
         return data
 
+
+class MyUserAccountProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUserAccount
+        fields = ['profile_picture', 'first_name', 'last_name', 'contact', 'profession', 'biography']
 

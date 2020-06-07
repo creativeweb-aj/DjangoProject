@@ -124,3 +124,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#Migrations folders
+AuthApp/migrations/
+PostApp/migrations/

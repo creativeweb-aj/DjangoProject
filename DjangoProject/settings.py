@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'six',
     'AuthApp',
+    'PostApp',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ]
 }
 
@@ -144,11 +146,16 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
     'http://192.168.1.101:4200',
+    'http://25.95.93.192:4200',
 ]
 
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://192.168.1.101:4200',
+    'http://25.95.93.192:4200',
 ]
+
+ENCRYPT_KEY = b'2TRwuyTh2qAY3PzZgXU6q8Sqqmdsw_eCvvTG1B_LuYo='
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
