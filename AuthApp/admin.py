@@ -11,6 +11,20 @@ class MyUserAccountAdmin(admin.ModelAdmin):
 
 admin.site.register(MyUserAccount, MyUserAccountAdmin)
 
-admin.site.register(emailHandler)
 
-admin.site.register(Follow)
+class EmailAdmin(admin.ModelAdmin):
+    list_display = ('email_id', 'subject', 'token', 'is_verify', 'sent_on', 'user')
+    search_fields = ['email_id', 'subject']
+    list_filter = ('email_id',)
+
+
+admin.site.register(emailHandler, EmailAdmin)
+
+
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('follower', 'following')
+    search_fields = ['follower', 'following']
+    list_filter = ('follower',)
+
+
+admin.site.register(Follow, FollowAdmin)

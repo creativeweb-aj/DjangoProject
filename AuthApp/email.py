@@ -39,7 +39,6 @@ class emailSendService:
         t.start()
 
     def sendEmail(self, email, subject, body):
-        print('send email method called', email, subject, body)
         mail = EmailMessage(subject, body, to=[email])
         mail.content_subtype = "html"
         is_sent = mail.send(fail_silently=False)
@@ -61,11 +60,7 @@ class emailSendService:
 
     def getEmailData(self):
         emails = emailHandler.objects.filter(is_sent=False, retry_count__lt=10)
-        print('emails ::', emails)
         for email in emails:
-            print('email :: ', email.email_id)
-            print('subject :: ', email.subject)
-            print('body :: ', email.body)
             self.sendEmail(email.email_id, email.subject, email.body)
         time.sleep(10)
 

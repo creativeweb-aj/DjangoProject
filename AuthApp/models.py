@@ -97,7 +97,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 # email handler table
 class emailHandler(models.Model):
-    user = models.ForeignKey(MyUserAccount, verbose_name='user id', on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUserAccount, verbose_name='user id', on_delete=models.SET_NULL, null=True)
     subject = models.CharField(verbose_name='Subject', max_length=255)
     email_id = models.EmailField(verbose_name='Email address', null=True)
     body = models.TextField(verbose_name='Body', null=True)
@@ -115,8 +115,8 @@ class emailHandler(models.Model):
 
 
 class Follow(models.Model):
-    follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.CASCADE)
-    following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.SET_NULL, null=True)
+    following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         unique_together = ('follower', 'following')

@@ -21,6 +21,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('auth/', include('AuthApp.urls')),
+    path('post/', include('PostApp.urls')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls'))
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

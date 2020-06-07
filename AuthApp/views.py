@@ -3,11 +3,12 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
-from rest_framework.parsers import JSONParser, FormParser
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from rest_framework.decorators import parser_classes, api_view
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
+from django.core.files.storage import FileSystemStorage
 from .models import *
 from .serializers import *
 from .email import *
@@ -55,8 +56,9 @@ def getEmailById(request):
         DictData = {}
         if user:
             serializer = MyUserAccountSerializer(user)
+            print('serializer email data ::::', serializer.data['email'])
             DictData['status'] = 'SUCCESS'
-            DictData['response'] = serializer.data.email
+            DictData['response'] = serializer.data['email']
             DictData['message'] = 'User email send'
             return Response(DictData, status=200)
         else:
@@ -139,7 +141,7 @@ def logOutUser(request):
     return Response(DictData, status=200)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def getCurrentUserProfile(request):
@@ -162,16 +164,37 @@ def getCurrentUserProfile(request):
 
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def editUserProfile(request):
     user = request.user
-    firstName = request.data('firstName')
-    lastName = request.data('lastName')
-    profilePic = request.data('profilePic')
-    profession = request.data('profession')
-    bio = request.data('bio')
-    contact = request.data('contact')
+    print('request', request.data)
+    print('request last name :: ', request.data['firstName'])
+    firstName = request.data['firstName']
+    lastName = request.data['lastName']
+    profilePic = request.FILES['profilePic']
+    profession = request.data['profession']
+    bio = request.data['bio']
+    contact = request.data['contact']
+    print('profilePic :: ', profilePic)
+    obj = MyUserAccount.objects.get(email=user)
+    print('obj :::', obj)
     DictData = {}
-    DictData['status'] = 'FAIL'
-    DictData['response'] = ''
-    DictData['message'] = 'User data not found'
-    return Response(DictData, status=406)
+    if obj:
+        print('obj first name ::', obj.first_name)
+        obj.first_name = firstName
+        obj.last_name = lastName
+        obj.profession = profession
+        obj.biography = bio
+        obj.contact = contact
+        obj.profile_picture = profilePic
+        obj.updated_on = calendar.timegm(time.gmtime())
+        obj.save()
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = ''  # serializer.data
+        DictData['message'] = 'User profile updated'
+        return Response(DictData, status=200)
+    else:
+        DictData['status'] = 'FAIL'
+        DictData['response'] = ''
+        DictData['message'] = 'User profile not updated'
+        return Response(DictData, status=406)
