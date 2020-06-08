@@ -167,15 +167,14 @@ def getCurrentUserProfile(request):
 @permission_classes([IsAuthenticated])
 def editUserProfile(request):
     user = request.user
-    print('request', request.data)
-    print('request last name :: ', request.data['firstName'])
     firstName = request.data['firstName']
     lastName = request.data['lastName']
-    profilePic = request.FILES['profilePic']
+    profileChange = request.data['profileChange']
+    if profileChange == 'True':
+        profilePic = request.FILES['profilePic']
     profession = request.data['profession']
     bio = request.data['bio']
     contact = request.data['contact']
-    print('profilePic :: ', profilePic)
     obj = MyUserAccount.objects.get(email=user)
     print('obj :::', obj)
     DictData = {}
@@ -186,7 +185,8 @@ def editUserProfile(request):
         obj.profession = profession
         obj.biography = bio
         obj.contact = contact
-        obj.profile_picture = profilePic
+        if profileChange == 'True':
+            obj.profile_picture = profilePic
         obj.updated_on = calendar.timegm(time.gmtime())
         obj.save()
         DictData['status'] = 'SUCCESS'
