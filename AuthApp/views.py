@@ -4,8 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
-from rest_framework.decorators import parser_classes, api_view
-from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from django.core.files.storage import FileSystemStorage
@@ -148,11 +146,15 @@ def getCurrentUserProfile(request):
     user = request.user
     print('user ::', user)
     obj = MyUserAccount.objects.get(email=user)
+    following = Follow.objects.filter(follower=user).count()
+    follower = Follow.objects.filter(following=user).count()
     DictData = {}
     if obj:
         serializer = MyUserAccountProfileSerializer(obj)
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
+        DictData['response']['following'] = following
+        DictData['response']['follower'] = follower
         DictData['message'] = 'User data send'
         return Response(DictData, status=200)
     else:

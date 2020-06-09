@@ -7,9 +7,9 @@ class Post(models.Model):
     created_by = models.ForeignKey(AUTH_USER_MODEL, verbose_name='Created By', related_name='Post_Created_By_user',
                                    on_delete=models.SET_NULL, null=True)
     title = models.CharField(verbose_name='Post Title', max_length=255, null=True)
-    tagged = models.ManyToManyField(AUTH_USER_MODEL, verbose_name='Tagged User', related_name='Tags')
+    # tagged = models.ManyToManyField(AUTH_USER_MODEL, verbose_name='Tagged User', related_name='Tags')
     content = models.TextField(verbose_name='Post Content', null=True)
-    post_image = models.ImageField(upload_to='posts/%d-%m-%y', null=True)
+    post_image = models.ImageField(upload_to='posts/%d-%m-%y/', null=True)
     hash_tag = models.CharField(verbose_name='Hash Tags', max_length=255, null=True)
     like = models.ManyToManyField(AUTH_USER_MODEL, verbose_name='Post Likes', related_name='Likes')
     created_on = models.BigIntegerField(verbose_name='Post Created Time', blank=True, null=True)

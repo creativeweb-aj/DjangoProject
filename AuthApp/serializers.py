@@ -48,3 +48,8 @@ class MyUserAccountProfileSerializer(serializers.ModelSerializer):
         model = MyUserAccount
         fields = ['profile_picture', 'first_name', 'last_name', 'contact', 'profession', 'biography']
 
+
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ['follower', 'following']
