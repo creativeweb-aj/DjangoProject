@@ -139,6 +139,7 @@ def logOutUser(request):
     return Response(DictData, status=200)
 
 
+
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
