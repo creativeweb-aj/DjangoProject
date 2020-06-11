@@ -14,7 +14,7 @@ import time
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def allPosts(request):
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by('-id')
     serializer = PostSerializer(posts, many=True)
     DictData = {}
     DictData['status'] = 'SUCCESS'
@@ -33,7 +33,7 @@ def getPostDetail(request):
         serializer = PostSerializer(posts)
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
-        DictData['message'] = 'All Posts sent'
+        DictData['message'] = 'Posts sent'
         return Response(DictData, status=200)
     else:
         DictData['status'] = 'FAIL'
@@ -64,7 +64,7 @@ def createPost(request):
         serializer = PostSerializer(post)
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
-        DictData['message'] = 'All Posts sent'
+        DictData['message'] = 'Posts Created Successfully'
         return Response(DictData, status=200)
     else:
         DictData['status'] = 'FAIL'
