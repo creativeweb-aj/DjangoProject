@@ -18,7 +18,7 @@ def allPosts(request):
     serializer = PostSerializer(posts, many=True)
     DictData = {}
     DictData['status'] = 'SUCCESS'
-    DictData['response'] = serializer.data
+    DictData['response'] = {'user': request.user, 'posts': serializer.data}
     DictData['message'] = 'All Posts sent'
     return Response(serializer.data, status=200)
 
@@ -94,3 +94,31 @@ def deletePost(request):
         DictData['response'] = ''
         DictData['message'] = 'Post Not Delete'
         return Response(DictData, status=406)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def postLikeDislike(request):
+    user = request.user
+    postId = request.data['postId']
+    userObj = MyUserAccount.objects.get(email=user)
+    liked = Post.objects.filter(id=postId, like=userObj)
+    postObj = Post.objects.get(id=postId)
+    DictData = {}
+    if liked:
+        postObj.like.remove(userObj)
+        postObj.save()
+        totalLike = postObj.like.count()
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = {'like': False, 'total': totalLike}
+        DictData['message'] = 'Post Disliked'
+        return Response(DictData, status=200)
+    else:
+        postObj.like.add(userObj)
+        postObj.save()
+        totalLike = postObj.like.count()
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = {'like': True, 'total': totalLike}
+        DictData['message'] = 'Post liked'
+        return Response(DictData, status=200)

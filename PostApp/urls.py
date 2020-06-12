@@ -9,4 +9,5 @@ urlpatterns = [
     path('post-detail', getPostDetail, name='getPostDetail'),
     path('create-post', createPost, name='createPost'),
     path('delete-post', deletePost, name='deletePost'),
+    path('like-dislike-post', postLikeDislike, name='postLikeDislike'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
