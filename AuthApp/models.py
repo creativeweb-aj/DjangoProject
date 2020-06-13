@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from DjangoProject.settings import *
 import calendar
 import time
 
@@ -63,6 +64,7 @@ class MyUserAccount(AbstractBaseUser):
     profession = models.CharField(verbose_name='profession', max_length=255, null=True)
     biography = models.TextField(verbose_name='bio', null=True)
     date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
+    followers = models.ManyToManyField(AUTH_USER_MODEL, related_name='Follow')
     created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
     updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
     is_active = models.BooleanField(default=False, null=True)
@@ -114,12 +116,12 @@ class emailHandler(models.Model):
         return self.email_id
 
 
-class Follow(models.Model):
-    follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.SET_NULL, null=True)
-    following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.SET_NULL, null=True)
-
-    class Meta:
-        unique_together = ('follower', 'following')
-
-    def __unicode__(self):
-        return u'%s follows %s' % (self.follower, self.following)
+# class Follow(models.Model):
+#     follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.SET_NULL, null=True)
+#     following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.SET_NULL, null=True)
+#
+#     class Meta:
+#         unique_together = ('follower', 'following')
+#
+#     def __unicode__(self):
+#         return u'%s follows %s' % (self.follower, self.following)

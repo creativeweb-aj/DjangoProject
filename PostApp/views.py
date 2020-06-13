@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from AuthApp.models import MyUserAccount
 from .models import *
 from .serializers import *
 import calendar
@@ -14,11 +15,25 @@ import time
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def allPosts(request):
-    posts = Post.objects.all().order_by('-id')
-    serializer = PostSerializer(posts, many=True)
+    posts = Post.objects.filter(is_delete=False).order_by('-id')
+    serializer = PostSerializer(posts, context={'request': request}, many=True)
     DictData = {}
     DictData['status'] = 'SUCCESS'
-    DictData['response'] = {'user': request.user, 'posts': serializer.data}
+    DictData['response'] = serializer.data
+    DictData['message'] = 'All Posts sent'
+    return Response(serializer.data, status=200)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def myPosts(request):
+    user = request.user
+    posts = Post.objects.filter(created_by=user, is_delete=False).order_by('-id')
+    serializer = PostSerializer(posts, context={'request': request}, many=True)
+    DictData = {}
+    DictData['status'] = 'SUCCESS'
+    DictData['response'] = serializer.data
     DictData['message'] = 'All Posts sent'
     return Response(serializer.data, status=200)
 
@@ -27,10 +42,10 @@ def allPosts(request):
 @permission_classes([IsAuthenticated])
 def getPostDetail(request):
     postId = request.data['postId']
-    posts = Post.objects.get(id=postId)
+    posts = Post.objects.get(id=postId, is_delete=False)
     DictData = {}
     if posts:
-        serializer = PostSerializer(posts)
+        serializer = PostSerializer(posts, context={'request': request})
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
         DictData['message'] = 'Posts sent'
@@ -61,9 +76,9 @@ def createPost(request):
         created_on=calendar.timegm(time.gmtime())
     )
     if post:
-        serializer = PostSerializer(post)
+        # serializer = PostSerializer(post)
         DictData['status'] = 'SUCCESS'
-        DictData['response'] = serializer.data
+        DictData['response'] = '' # serializer.data
         DictData['message'] = 'Posts Created Successfully'
         return Response(DictData, status=200)
     else:
@@ -102,8 +117,8 @@ def deletePost(request):
 def postLikeDislike(request):
     user = request.user
     postId = request.data['postId']
-    userObj = MyUserAccount.objects.get(email=user)
-    liked = Post.objects.filter(id=postId, like=userObj)
+    userObj = MyUserAccount.objects.get(email=user, is_delete=False)
+    liked = Post.objects.filter(id=postId, like=userObj, is_delete=False)
     postObj = Post.objects.get(id=postId)
     DictData = {}
     if liked:

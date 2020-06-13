@@ -145,17 +145,12 @@ def logOutUser(request):
 @permission_classes([IsAuthenticated])
 def getCurrentUserProfile(request):
     user = request.user
-    print('user ::', user)
-    obj = MyUserAccount.objects.get(email=user)
-    following = Follow.objects.filter(follower=user).count()
-    follower = Follow.objects.filter(following=user).count()
+    obj = MyUserAccount.objects.get(email=user, is_active=True, is_delete=False)
     DictData = {}
     if obj:
-        serializer = MyUserAccountProfileSerializer(obj)
+        serializer = MyUserAccountProfileSerializer(obj, context={'request': request})
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
-        DictData['response']['following'] = following
-        DictData['response']['follower'] = follower
         DictData['message'] = 'User data send'
         return Response(DictData, status=200)
     else:
@@ -163,6 +158,61 @@ def getCurrentUserProfile(request):
         DictData['response'] = ''
         DictData['message'] = 'User data not found'
         return Response(DictData, status=406)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getUserProfile(request):
+    user = request.user
+    userId = request.data['userId']
+    obj = MyUserAccount.objects.get(id=userId, is_active=True, is_delete=False)
+    DictData = {}
+    if user == obj:
+        sameUser = True
+    else:
+        sameUser = False
+    if obj:
+        serializer = MyUserAccountProfileSerializer(obj, context={'request': request})
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = serializer.data
+        DictData['response']['sameUser'] = sameUser
+        DictData['message'] = 'User data send'
+        return Response(DictData, status=200)
+    else:
+        DictData['status'] = 'FAIL'
+        DictData['response'] = ''
+        DictData['message'] = 'User data not found'
+        return Response(DictData, status=406)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def followUser(request):
+    user = request.user
+    userId = request.data['userId']
+    followerUser = MyUserAccount.objects.get(email=user, is_active=True, is_delete=False)
+    DictData = {}
+    follow = MyUserAccount.objects.filter(id=userId, followers=followerUser, is_active=True, is_delete=False).exists()
+    if follow:
+        follow = MyUserAccount.objects.get(id=userId)
+        follow.followers.remove(followerUser)
+        serializer = MyUserAccountProfileSerializer(follow, context={'request': request})
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = serializer.data
+        DictData['message'] = 'User Unfollowed'
+        return Response(DictData, status=200)
+    else:
+        follow = MyUserAccount.objects.get(id=userId)
+        follow.followers.add(followerUser)
+        serializer = MyUserAccountProfileSerializer(follow, context={'request': request})
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = serializer.data
+        DictData['message'] = 'User Followed'
+        return Response(DictData, status=200)
+
+
 
 
 @api_view(['POST'])

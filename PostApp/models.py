@@ -18,3 +18,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Like(models.Model):
+    user_id = models.ForeignKey(AUTH_USER_MODEL, verbose_name='User Id', related_name='User',
+                                on_delete=models.SET_NULL, null=True)
+    post_id = models.ForeignKey(Post, verbose_name='Post Id', related_name='Post',
+                                on_delete=models.SET_NULL, null=True)

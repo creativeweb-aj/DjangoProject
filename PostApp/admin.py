@@ -8,3 +8,5 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('title', 'created_by',)
 
 admin.site.register(Post, PostAdmin)
+
+admin.site.register(Like)
