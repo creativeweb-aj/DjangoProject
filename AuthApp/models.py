@@ -115,13 +115,3 @@ class emailHandler(models.Model):
     def __str__(self):
         return self.email_id
 
-
-# class Follow(models.Model):
-#     follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.SET_NULL, null=True)
-#     following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.SET_NULL, null=True)
-#
-#     class Meta:
-#         unique_together = ('follower', 'following')
-#
-#     def __unicode__(self):
-#         return u'%s follows %s' % (self.follower, self.following)

@@ -69,18 +69,16 @@ def getEmailById(request):
 @api_view(['POST'])
 def emailVerification(request):
     if request.method == 'POST':
-        print(request.data)
         emailId = request.data['emailId']
         otp = request.data['otp']
         currentTime = calendar.timegm(time.gmtime())
         DictData = {}
-        if emailId and otp:
+        query = emailHandler.objects.filter(email_id=emailId, is_sent=True, is_verify=False).exists()
+        if emailId and otp and query:
             emailData = emailHandler.objects.get(email_id=emailId, is_sent=True, is_verify=False)
-            print('email data from table :: ', emailData)
-            print('email data from table is expiry :: ', emailData.is_expiry)
+            print('email data ::', emailData)
             expiredDate = emailData.is_expiry - currentTime
             expiredDate = expiredDate / 60
-            print('expired date :: ', expiredDate)
             if int(expiredDate) < 1440:
                 if emailData.token == int(otp):
                     emailData.is_verify = True
@@ -111,7 +109,7 @@ def emailVerification(request):
         else:
             DictData['status'] = 'FAIL'
             DictData['response'] = ''
-            DictData['message'] = 'Please enter OTP then send'
+            DictData['message'] = 'Please enter OTP then send or you are already verified'
             return Response(DictData, status=406)
 
 
@@ -137,7 +135,6 @@ def logOutUser(request):
     logout(request)
     DictData = {'status': 'SUCCESS', 'response': '', 'message': 'User logout successfully'}
     return Response(DictData, status=200)
-
 
 
 @api_view(['GET'])
@@ -211,8 +208,6 @@ def followUser(request):
         DictData['response'] = serializer.data
         DictData['message'] = 'User Followed'
         return Response(DictData, status=200)
-
-
 
 
 @api_view(['POST'])

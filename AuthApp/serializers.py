@@ -59,10 +59,6 @@ class MyUserAccountProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyUserAccount
-        fields = ['id', 'follower', 'following', 'followed_by', 'isFollow', 'profile_picture', 'first_name', 'last_name', 'email', 'contact', 'profession', 'biography']
+        fields = ['id', 'follower', 'following', 'followed_by', 'isFollow', 'profile_picture', 'first_name',
+                  'last_name', 'email', 'contact', 'profession', 'biography']
 
-
-# class FollowSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Follow
-#         fields = ['follower', 'following']
