@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 from DjangoProject.settings import *
+from PIL import Image
 import calendar
 import time
 
@@ -89,6 +90,14 @@ class MyUserAccount(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     img = Image.open(self.profile_picture.path)
+    #     if img.height > 100 or img.weight > 100:
+    #         output_size = (100, 100)
+    #         img.thumbnail(output_size)
+    #         img.save(self.profile_picture.path)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
