@@ -137,3 +137,4 @@ def postLikeDislike(request):
         DictData['response'] = {'like': True, 'total': totalLike}
         DictData['message'] = 'Post liked'
         return Response(DictData, status=200)
+

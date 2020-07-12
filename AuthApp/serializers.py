@@ -61,4 +61,3 @@ class MyUserAccountProfileSerializer(serializers.ModelSerializer):
         model = MyUserAccount
         fields = ['id', 'follower', 'following', 'followed_by', 'isFollow', 'profile_picture', 'first_name',
                   'last_name', 'email', 'contact', 'profession', 'biography']
-

@@ -68,7 +68,7 @@ class MyUserAccount(AbstractBaseUser):
     followers = models.ManyToManyField(AUTH_USER_MODEL, related_name='Follow')
     created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
     updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
-    is_active = models.BooleanField(default=False, null=True)
+    is_active = models.BooleanField(default=True, null=True)
     is_staff = models.BooleanField(default=False, null=True)
     is_admin = models.BooleanField(default=False, null=True)
     is_delete = models.BooleanField(default=False, null=True)

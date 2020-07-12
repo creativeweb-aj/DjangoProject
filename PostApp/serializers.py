@@ -19,3 +19,11 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked', 'hash_tag',
                   'created_on', 'created_by']
+
+
+class testProfileSerializer(serializers.ModelSerializer):
+    post = PostSerializer(many=True)
+
+    class Meta:
+        model = MyUserAccount
+        fields = ['id', 'first_name', 'email', 'post']

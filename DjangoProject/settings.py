@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'drfpasswordless',
     'corsheaders',
     'AuthApp',
     'PostApp',
@@ -71,6 +72,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ]
+}
+
+PASSWORDLESS_AUTH = {
+   'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+   'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
 }
 
 ROOT_URLCONF = 'DjangoProject.urls'
@@ -144,6 +150,7 @@ AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
+    'http://192.168.1.100',
     'http://192.168.1.101:4200',
     'http://25.95.93.192:4200',
 ]
