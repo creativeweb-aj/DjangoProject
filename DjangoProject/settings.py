@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'drfpasswordless',
     'corsheaders',
-    'six',
     'AuthApp',
     'PostApp',
 ]
@@ -64,7 +64,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_PARSER_CLASSES': [
@@ -72,6 +72,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ]
+}
+
+PASSWORDLESS_AUTH = {
+   'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+   'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
 }
 
 ROOT_URLCONF = 'DjangoProject.urls'
@@ -145,13 +150,21 @@ AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
+    'http://192.168.1.100',
+    'http://192.168.1.8',
+    'http://127.0.0.1',
     'http://192.168.1.101:4200',
+    'http://192.168.1.8:4200',
     'http://25.95.93.192:4200',
+    'http://localhost:4200',
 ]
 
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://192.168.1.101:4200',
     'http://25.95.93.192:4200',
+    'http://192.168.1.8:4200',
+    'http://localhost:4200',
+    'http://127.0.0.1:4200',
 ]
 
 ENCRYPT_KEY = b'2TRwuyTh2qAY3PzZgXU6q8Sqqmdsw_eCvvTG1B_LuYo='

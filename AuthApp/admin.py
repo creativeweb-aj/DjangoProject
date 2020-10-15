@@ -21,10 +21,10 @@ class EmailAdmin(admin.ModelAdmin):
 admin.site.register(emailHandler, EmailAdmin)
 
 
-class FollowAdmin(admin.ModelAdmin):
-    list_display = ('follower', 'following')
-    search_fields = ['follower', 'following']
-    list_filter = ('follower',)
-
-
-admin.site.register(Follow, FollowAdmin)
+# class FollowAdmin(admin.ModelAdmin):
+#     list_display = ('follower', 'following')
+#     search_fields = ['follower', 'following']
+#     list_filter = ('follower',)
+#
+#
+# admin.site.register(Follow, FollowAdmin)

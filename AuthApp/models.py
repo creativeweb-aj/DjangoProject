@@ -6,6 +6,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from DjangoProject.settings import *
+from PIL import Image
 import calendar
 import time
 
@@ -63,9 +65,10 @@ class MyUserAccount(AbstractBaseUser):
     profession = models.CharField(verbose_name='profession', max_length=255, null=True)
     biography = models.TextField(verbose_name='bio', null=True)
     date_of_birth = models.BigIntegerField(verbose_name='Date of Birth', null=True)
+    followers = models.ManyToManyField(AUTH_USER_MODEL, related_name='Follow')
     created_on = models.BigIntegerField(verbose_name='Join Date', null=True)
     updated_on = models.BigIntegerField(verbose_name='Update Date', null=True)
-    is_active = models.BooleanField(default=False, null=True)
+    is_active = models.BooleanField(default=True, null=True)
     is_staff = models.BooleanField(default=False, null=True)
     is_admin = models.BooleanField(default=False, null=True)
     is_delete = models.BooleanField(default=False, null=True)
@@ -87,6 +90,14 @@ class MyUserAccount(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     img = Image.open(self.profile_picture.path)
+    #     if img.height > 100 or img.weight > 100:
+    #         output_size = (100, 100)
+    #         img.thumbnail(output_size)
+    #         img.save(self.profile_picture.path)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -113,13 +124,3 @@ class emailHandler(models.Model):
     def __str__(self):
         return self.email_id
 
-
-class Follow(models.Model):
-    follower = models.ForeignKey(MyUserAccount, related_name='following', on_delete=models.SET_NULL, null=True)
-    following = models.ForeignKey(MyUserAccount, related_name='followers', on_delete=models.SET_NULL, null=True)
-
-    class Meta:
-        unique_together = ('follower', 'following')
-
-    def __unicode__(self):
-        return u'%s follows %s' % (self.follower, self.following)

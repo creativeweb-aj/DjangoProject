@@ -44,12 +44,20 @@ class LoginUserSerializer(serializers.Serializer):
 
 
 class MyUserAccountProfileSerializer(serializers.ModelSerializer):
+    follower = serializers.IntegerField(source='followers.count', read_only=True)
+    followed_by = MyUserAccountSerializer(source='followers', many=True)
+    isFollow = serializers.SerializerMethodField('get_isFollowed')
+    following = serializers.SerializerMethodField('get_followings')
+
+    def get_isFollowed(self, obj):
+        user = self.context['request'].user
+        followerUser = MyUserAccount.objects.get(email=user, is_active=True, is_delete=False)
+        return MyUserAccount.objects.filter(id=obj.id, followers=followerUser, is_active=True, is_delete=False).exists()
+
+    def get_followings(self, obj):
+        return MyUserAccount.objects.filter(followers=obj.id, is_active=True, is_delete=False).count()
+
     class Meta:
         model = MyUserAccount
-        fields = ['profile_picture', 'first_name', 'last_name', 'contact', 'profession', 'biography']
-
-
-class FollowSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Follow
-        fields = ['follower', 'following']
+        fields = ['id', 'follower', 'following', 'followed_by', 'isFollow', 'profile_picture', 'first_name',
+                  'last_name', 'email', 'contact', 'profession', 'biography']

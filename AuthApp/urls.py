@@ -11,5 +11,7 @@ urlpatterns = [
     path('login', logInUser, name='logInUser'),
     path('logout', logOutUser, name='logOutUser'),
     path('profile', getCurrentUserProfile, name='getCurrentUserProfile'),
+    path('user-profile', getUserProfile, name='getUserProfile'),
+    path('follow-user', followUser, name='followUser'),
     path('edit-profile', editUserProfile, name='editUserProfile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
