@@ -114,8 +114,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djangong',
-        'USER': 'root',
-        'PASSWORD': 'root',
+        'USER': 'debian-sys-maint',
+        'PASSWORD': 'pLOpkbGobXinFZsP',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -150,7 +150,7 @@ AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = [
-    'http://192.168.1.100',
+    'http://192.168.1.11',
     'http://192.168.1.8',
     'http://127.0.0.1',
     'http://192.168.1.101:4200',
@@ -160,7 +160,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://192.168.1.101:4200',
+    'http://192.168.1.11:4200',
     'http://25.95.93.192:4200',
     'http://192.168.1.8:4200',
     'http://localhost:4200',
