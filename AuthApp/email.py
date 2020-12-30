@@ -64,4 +64,3 @@ class emailSendService:
             self.sendEmail(email.email_id, email.subject, email.body)
         time.sleep(10)
 
-

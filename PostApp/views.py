@@ -3,8 +3,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from AuthApp.models import MyUserAccount
-from .models import *
 from .serializers import *
 import calendar
 import time
@@ -65,14 +63,12 @@ def createPost(request):
     title = request.data['title']
     content = request.data['content']
     postImage = request.FILES['postImage']
-    hashTag = request.data['hashTag']
     DictData = {}
     post = Post.objects.create(
         created_by=user,
         title=title,
         content=content,
         post_image=postImage,
-        hash_tag=hashTag,
         created_on=calendar.timegm(time.gmtime())
     )
     if post:
