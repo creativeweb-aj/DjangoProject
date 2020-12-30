@@ -1,7 +1,6 @@
-from rest_framework import serializers, exceptions
+from rest_framework import serializers
 from AuthApp.serializers import MyUserAccountSerializer, MyUserAccountProfileSerializer
 from AuthApp.models import MyUserAccount
-import json
 from .models import *
 
 
@@ -17,13 +16,6 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked', 'hash_tag',
+        fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked',
                   'created_on', 'created_by']
 
-
-class testProfileSerializer(serializers.ModelSerializer):
-    post = PostSerializer(many=True)
-
-    class Meta:
-        model = MyUserAccount
-        fields = ['id', 'first_name', 'email', 'post']
