@@ -35,6 +35,7 @@ def myPosts(request):
     DictData['message'] = 'All Posts sent'
     return Response(serializer.data, status=200)
 
+
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -74,7 +75,7 @@ def createPost(request):
     if post:
         # serializer = PostSerializer(post)
         DictData['status'] = 'SUCCESS'
-        DictData['response'] = '' # serializer.data
+        DictData['response'] = ''  # serializer.data
         DictData['message'] = 'Posts Created Successfully'
         return Response(DictData, status=200)
     else:
@@ -134,3 +135,31 @@ def postLikeDislike(request):
         DictData['message'] = 'Post liked'
         return Response(DictData, status=200)
 
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def addComment(request):
+    user = request.user
+    postId = request.data['postId']
+    content = request.data['content']
+    userObj = MyUserAccount.objects.get(email=user, is_delete=False)
+    postObj = Post.objects.get(id=postId, is_delete=False)
+    DictData = {}
+    comment = Comment.objects.create(
+        user_id=userObj,
+        post_id=postObj,
+        content=content,
+        created_on=calendar.timegm(time.gmtime())
+    )
+    if comment:
+        serializer = CommentSerializer(comment)
+        DictData['status'] = 'SUCCESS'
+        DictData['response'] = serializer.data
+        DictData['message'] = 'Comment Created Successfully'
+        return Response(DictData, status=200)
+    else:
+        DictData['status'] = 'FAIL'
+        DictData['response'] = ''
+        DictData['message'] = 'Comment Add Request Failed'
+        return Response(DictData, status=406)

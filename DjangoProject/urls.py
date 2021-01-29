@@ -21,6 +21,12 @@ from rest_framework_swagger.views import get_swagger_view
 
 schema_view = get_swagger_view(title='Creative web API')
 
+admin.site.site_header = 'Creative Web Admin'
+admin.site.site_title = 'Creative Web'
+admin.site.site_url = 'http://creativeweb.com/'
+admin.site.index_title = 'CreativeWeb administration'
+admin.empty_value_display = '**Empty**'
+
 urlpatterns = [
                   path('api/', schema_view),
                   path('auth/', include('AuthApp.urls')),
