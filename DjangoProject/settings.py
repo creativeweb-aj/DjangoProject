@@ -116,8 +116,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djangong',
-        'USER': 'debian-sys-maint',
-        'PASSWORD': 'pLOpkbGobXinFZsP',
+        'USER': os.environ.get("MYAPP_DB_USER", 'debian-sys-maint'),
+        'PASSWORD': os.environ.get("MYAPP_DB_PASSWORD", 'pLOpkbGobXinFZsP'),
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -125,8 +125,8 @@ DATABASES = {
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'ajaysharmadevelopment@gmail.com'
-EMAIL_HOST_PASSWORD = 'Ajay@143136'
+EMAIL_HOST_USER = os.environ.get("MYAPP_EMAIL_USER", '')
+EMAIL_HOST_PASSWORD = os.environ.get("MYAPP_EMAIL_PASSWORD", '')
 EMAIL_PORT = 587
 
 # Password validation
