@@ -128,3 +128,5 @@ dmypy.json
 #Migrations folders
 AuthApp/migrations
 PostApp/migrations
+
+env.txt
