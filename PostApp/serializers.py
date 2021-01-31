@@ -20,8 +20,8 @@ class PostSerializer(serializers.ModelSerializer):
     likes = serializers.IntegerField(source='like.count', read_only=True)
     liked_by = MyUserAccountSerializer(source='like', many=True)
     isLiked = serializers.SerializerMethodField('get_isLiked')
-    total_comments = serializers.IntegerField(source='comment.count', read_only=True)
-    comment = CommentSerializer(source='comment', many=True)
+    # total_comments = serializers.IntegerField(source='comment.count', read_only=True)
+    # comment = CommentSerializer(source='comment', many=True)
 
     def get_isLiked(self, obj):
         user = self.context['request'].user
@@ -30,4 +30,4 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked',
-                  'total_comments', 'comment', 'created_on', 'created_by']
+                  'created_on', 'created_by']

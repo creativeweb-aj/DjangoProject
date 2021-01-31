@@ -62,5 +62,5 @@ class emailSendService:
         emails = emailHandler.objects.filter(is_sent=False, retry_count__lt=10)
         for email in emails:
             self.sendEmail(email.email_id, email.subject, email.body)
-        time.sleep(10)
+        time.sleep(5)
 
