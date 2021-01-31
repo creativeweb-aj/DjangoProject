@@ -10,23 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'a_eit*qp51vgq0f8c9c@o_nozqrij%n%#(l6!$gy6fguj2sxp!'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
+from dev import *
+# from prod import *
 
 # Application definition
 
@@ -39,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_swagger',
     'drfpasswordless',
     'corsheaders',
     'AuthApp',
@@ -81,6 +65,8 @@ PASSWORDLESS_AUTH = {
    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
 }
 
+AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
+
 ROOT_URLCONF = 'DjangoProject.urls'
 
 TEMPLATES = [
@@ -102,32 +88,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'djangong',
-        'USER': os.environ.get("MYAPP_DB_USER", 'debian-sys-maint'),
-        'PASSWORD': os.environ.get("MYAPP_DB_PASSWORD", 'pLOpkbGobXinFZsP'),
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = os.environ.get("MYAPP_EMAIL_USER", '')
-EMAIL_HOST_PASSWORD = os.environ.get("MYAPP_EMAIL_PASSWORD", '')
-EMAIL_PORT = 587
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -147,23 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
-
 CORS_ORIGIN_ALLOW_ALL = False
-
-CORS_ORIGIN_WHITELIST = [
-    'http://192.168.1.11',
-    'http://127.0.0.1',
-    'http://localhost:4200'
-]
-
-CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://192.168.1.11:4200',
-    'http://localhost:4200',
-    'http://127.0.0.1:4200'
-]
-
-ENCRYPT_KEY = b'2TRwuyTh2qAY3PzZgXU6q8Sqqmdsw_eCvvTG1B_LuYo='
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -178,12 +122,3 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
