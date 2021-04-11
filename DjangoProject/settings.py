@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
+
 from DjangoProject.local.dev import *
-#from DjangoProject.local.dev import *
+
+# from DjangoProject.local.dev import *
 
 # Application definition
 
@@ -48,7 +50,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        #'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_PARSER_CLASSES': [
@@ -60,8 +62,8 @@ REST_FRAMEWORK = {
 }
 
 PASSWORDLESS_AUTH = {
-   'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
-   'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
 }
 
 AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
@@ -86,8 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'DjangoProject.wsgi.application'
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -120,4 +120,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
