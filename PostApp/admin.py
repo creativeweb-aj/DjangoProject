@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import *
+from mptt.admin import MPTTModelAdmin
 
 
 # Register your models here.
@@ -19,7 +20,7 @@ class PostLikeAdmin(admin.ModelAdmin):
 admin.site.register(Like, PostLikeAdmin)
 
 
-class PostCommentAdmin(admin.ModelAdmin):
+class PostCommentAdmin(MPTTModelAdmin):
     list_display = ('user_id', 'post_id', 'content', 'created_on',)
 
 
