@@ -7,12 +7,18 @@ from .models import *
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user_id = SerializerMethodField()
-    post_id = SerializerMethodField()
+    child_comments = serializers.SerializerMethodField('get_parent_comment')
+
+    def get_parent_comment(self, obj):
+        user = self.context['request'].user
+        request = self.context['request']
+        data = Comment.objects.filter(parent=obj.id, user_id=user)
+        comments = CommentSerializer(data, context={'request': request}, many=True)
+        return comments.data
 
     class Meta:
         model = Comment
-        fields = ['user_id', 'post_id', 'content', 'created_on']
+        fields = ['user_id', 'post_id', 'parent', 'child_comments', 'content', 'created_on']
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -20,14 +26,26 @@ class PostSerializer(serializers.ModelSerializer):
     likes = serializers.IntegerField(source='like.count', read_only=True)
     liked_by = MyUserAccountSerializer(source='like', many=True)
     isLiked = serializers.SerializerMethodField('get_isLiked')
-    # total_comments = serializers.IntegerField(source='comment.count', read_only=True)
-    # comment = CommentSerializer(source='comment', many=True)
+    total_comments = serializers.SerializerMethodField('get_total_comment_count')
+    comment = serializers.SerializerMethodField('get_comments')
 
     def get_isLiked(self, obj):
         user = self.context['request'].user
         return Post.objects.filter(id=obj.id, like=user).exists()
 
+    def get_comments(self, obj):
+        user = self.context['request'].user
+        request = self.context['request']
+        comments = Comment.objects.filter(post_id=obj.id, user_id=user, parent=None)
+        data_obj = CommentSerializer(comments, context={'request': request}, many=True)
+        return data_obj.data
+
+    def get_total_comment_count(self, obj):
+        user = self.context['request'].user
+        comments = Comment.objects.filter(post_id=obj.id, user_id=user).count()
+        return comments
+
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked',
+        fields = ['id', 'title', 'content', 'post_image', 'likes', 'liked_by', 'isLiked', 'comment', 'total_comments',
                   'created_on', 'created_by']
