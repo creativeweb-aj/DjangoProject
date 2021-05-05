@@ -7,9 +7,18 @@ from .models import *
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    child_comments = serializers.SerializerMethodField('get_parent_comment')
+
+    def get_parent_comment(self, obj):
+        user = self.context['request'].user
+        request = self.context['request']
+        data = Comment.objects.filter(parent=obj.id, user_id=user)
+        comments = CommentSerializer(data, context={'request': request}, many=True)
+        return comments.data
+
     class Meta:
         model = Comment
-        fields = ['user_id', 'post_id', 'parent', 'content', 'created_on']
+        fields = ['user_id', 'post_id', 'parent', 'child_comments', 'content', 'created_on']
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -27,7 +36,7 @@ class PostSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         user = self.context['request'].user
         request = self.context['request']
-        comments = Comment.objects.filter(post_id=obj.id, user_id=user)
+        comments = Comment.objects.filter(post_id=obj.id, user_id=user, parent=None)
         data_obj = CommentSerializer(comments, context={'request': request}, many=True)
         return data_obj.data
 
