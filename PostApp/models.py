@@ -1,5 +1,6 @@
 from django.db import models
 from DjangoProject.settings import *
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 # Create your models here.
@@ -28,10 +29,14 @@ class Like(models.Model):
                                 on_delete=models.SET_NULL, null=True)
 
 
-class Comment(models.Model):
+class Comment(MPTTModel):
     user_id = models.ForeignKey(AUTH_USER_MODEL, verbose_name='User Id', related_name='User_Comment',
                                 on_delete=models.SET_NULL, null=True)
     post_id = models.ForeignKey(Post, verbose_name='Post Id', related_name='Post_Comment',
                                 on_delete=models.SET_NULL, null=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     content = models.TextField(verbose_name='Post Comment', null=True)
     created_on = models.BigIntegerField(verbose_name='Comment Created Time', blank=True, null=True)
+
+    class MPTTMeta:
+        order_insertion_by = ['created_on']

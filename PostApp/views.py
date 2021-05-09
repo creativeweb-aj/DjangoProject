@@ -9,17 +9,15 @@ import time
 
 
 # Create your views here.
-@api_view(['GET'])
+@api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def allPosts(request):
-    posts = Post.objects.filter(is_delete=False).order_by('-id')
+    key = request.data['search']
+    posts = Post.objects.filter(title__contains=key, is_delete=False).order_by('-id')
     serializer = PostSerializer(posts, context={'request': request}, many=True)
-    DictData = {}
-    DictData['status'] = 'SUCCESS'
-    DictData['response'] = serializer.data
-    DictData['message'] = 'All Posts sent'
-    return Response(serializer.data, status=200)
+    DictData = {'status': 'SUCCESS', 'response': serializer.data, 'message': 'All Posts sent'}
+    return Response(DictData, status=200)
 
 
 @api_view(['GET'])
