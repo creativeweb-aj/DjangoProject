@@ -27,11 +27,8 @@ def myPosts(request):
     user = request.user
     posts = Post.objects.filter(created_by=user, is_delete=False).order_by('-id')
     serializer = PostSerializer(posts, context={'request': request}, many=True)
-    DictData = {}
-    DictData['status'] = 'SUCCESS'
-    DictData['response'] = serializer.data
-    DictData['message'] = 'All Posts sent'
-    return Response(serializer.data, status=200)
+    DictData = {'status': 'SUCCESS', 'response': serializer.data, 'message': 'All Posts sent'}
+    return Response(DictData, status=200)
 
 
 @api_view(['POST'])
