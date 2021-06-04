@@ -1,6 +1,7 @@
 from rest_framework import serializers, exceptions
 from django.contrib.auth import authenticate, login, logout
 from .models import *
+from PostApp.models import Post
 
 
 class MyUserAccountSerializer(serializers.ModelSerializer):
@@ -48,6 +49,7 @@ class MyUserAccountProfileSerializer(serializers.ModelSerializer):
     followed_by = MyUserAccountSerializer(source='followers', many=True)
     isFollow = serializers.SerializerMethodField('get_isFollowed')
     following = serializers.SerializerMethodField('get_followings')
+    posts = serializers.SerializerMethodField('getTotalPosts')
 
     def get_isFollowed(self, obj):
         user = self.context['request'].user
@@ -57,7 +59,11 @@ class MyUserAccountProfileSerializer(serializers.ModelSerializer):
     def get_followings(self, obj):
         return MyUserAccount.objects.filter(followers=obj.id, is_active=True, is_delete=False).count()
 
+    def getTotalPosts(self, obj):
+        posts = Post.objects.filter(created_by=obj.id, is_delete=False).count()
+        return posts
+
     class Meta:
         model = MyUserAccount
-        fields = ['id', 'follower', 'following', 'followed_by', 'isFollow', 'profile_picture', 'first_name',
+        fields = ['id', 'follower', 'following', 'posts', 'followed_by', 'isFollow', 'profile_picture', 'first_name',
                   'last_name', 'email', 'contact', 'profession', 'biography']

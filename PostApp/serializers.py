@@ -8,6 +8,7 @@ from .models import *
 
 class CommentSerializer(serializers.ModelSerializer):
     child_comments = serializers.SerializerMethodField('get_parent_comment')
+    user_id = MyUserAccountProfileSerializer()
 
     def get_parent_comment(self, obj):
         user = self.context['request'].user
@@ -34,15 +35,15 @@ class PostSerializer(serializers.ModelSerializer):
         return Post.objects.filter(id=obj.id, like=user).exists()
 
     def get_comments(self, obj):
-        user = self.context['request'].user
+        # user = self.context['request'].user
         request = self.context['request']
-        comments = Comment.objects.filter(post_id=obj.id, user_id=user, parent=None)
+        comments = Comment.objects.filter(post_id=obj.id, parent=None)
         data_obj = CommentSerializer(comments, context={'request': request}, many=True)
         return data_obj.data
 
     def get_total_comment_count(self, obj):
-        user = self.context['request'].user
-        comments = Comment.objects.filter(post_id=obj.id, user_id=user).count()
+        # user = self.context['request'].user
+        comments = Comment.objects.filter(post_id=obj.id).count()
         return comments
 
     class Meta:

@@ -91,14 +91,6 @@ class MyUserAccount(AbstractBaseUser):
         # Simplest possible answer: Yes, always
         return True
 
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
-    #     img = Image.open(self.profile_picture.path)
-    #     if img.height > 100 or img.weight > 100:
-    #         output_size = (100, 100)
-    #         img.thumbnail(output_size)
-    #         img.save(self.profile_picture.path)
-
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -112,6 +104,7 @@ class emailHandler(models.Model):
     subject = models.CharField(verbose_name='Subject', max_length=255)
     email_id = models.EmailField(verbose_name='Email address', null=True)
     body = models.TextField(verbose_name='Body', null=True)
+    uuid = models.TextField(verbose_name='UUID', null=True)
     token = models.BigIntegerField(verbose_name='Token', null=True)
     is_sent = models.BooleanField(verbose_name='Is sent', default=False, null=True)
     is_verify = models.BooleanField(verbose_name='Is verify', default=False, null=True)

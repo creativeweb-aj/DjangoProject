@@ -13,7 +13,7 @@ admin.site.register(MyUserAccount, MyUserAccountAdmin)
 
 
 class EmailAdmin(admin.ModelAdmin):
-    list_display = ('email_id', 'subject', 'token', 'is_verify', 'sent_on', 'user')
+    list_display = ('email_id', 'subject', 'uuid', 'token', 'is_verify', 'sent_on', 'user')
     search_fields = ['email_id', 'subject']
     list_filter = ('email_id',)
 

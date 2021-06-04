@@ -7,6 +7,7 @@ app_name = "PostApp"
 urlpatterns = [
     path('posts', allPosts, name='allPosts'),
     path('my-posts', myPosts, name='myPosts'),
+    path('user-posts', userPosts, name='myPosts'),
     path('post-detail', getPostDetail, name='getPostDetail'),
     path('create-post', createPost, name='createPost'),
     path('delete-post', deletePost, name='deletePost'),

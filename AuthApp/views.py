@@ -27,22 +27,23 @@ def createUserAccount(request):
             DictData['status'] = 'FAIL'
             DictData['response'] = ''
             DictData['message'] = 'Password must match'
+            status_code = 401
         elif MyUserAccount.objects.filter(email=email).exists():
             DictData['status'] = 'FAIL'
             DictData['response'] = ''
             DictData['message'] = 'Email is already exist'
+            status_code = 409
         else:
             user = MyUserAccount.objects.create_user(first_name, last_name, date_of_birth, email, password)
             emailService = emailSendService()
             emailService.saveEmail(user)
             serializer = MyUserAccountSerializer(user)
-            # token = Token.objects.get(user_id=user)
-            key = encrypt(user.id)
             DictData['status'] = 'SUCCESS'
-            DictData['keyId'] = key
-            DictData['response'] = serializer.data
+            DictData['response'] = {}
+            DictData['response']['data'] = serializer.data
             DictData['message'] = 'User created, Please verify email to login'
-        return Response(DictData, status=201)
+            status_code = 201
+        return Response(DictData, status=status_code)
 
 
 @api_view(['POST'])
@@ -69,48 +70,39 @@ def getEmailById(request):
 @api_view(['POST'])
 def emailVerification(request):
     if request.method == 'POST':
-        emailId = request.data['emailId']
-        otp = request.data['otp']
-        currentTime = calendar.timegm(time.gmtime())
+        uuid = request.data['uuid']
         DictData = {}
-        query = emailHandler.objects.filter(email_id=emailId, is_sent=True, is_verify=False).exists()
-        if emailId and otp and query:
-            emailData = emailHandler.objects.get(email_id=emailId, is_sent=True, is_verify=False)
+        query = emailHandler.objects.filter(uuid=uuid, is_sent=True, is_verify=False).exists()
+        if query:
+            emailData = emailHandler.objects.get(uuid=uuid, is_sent=True, is_verify=False)
             print('email data ::', emailData)
-            expiredDate = emailData.is_expiry - currentTime
+            expiredDate = emailData.is_expiry - calendar.timegm(time.gmtime())
             expiredDate = expiredDate / 60
             if int(expiredDate) < 1440:
-                if emailData.token == int(otp):
-                    emailData.is_verify = True
-                    emailData.updated_on = calendar.timegm(time.gmtime())
-                    emailData.save()
-                    userData = MyUserAccount.objects.get(email=emailId)
-                    userData.is_active = True
-                    userData.updated_on = calendar.timegm(time.gmtime())
-                    userData.save()
-                    DictData['status'] = 'SUCCESS'
-                    DictData['response'] = ''
-                    DictData['message'] = 'Email verified successfully'
-                    return Response(DictData, status=200)
-                else:
-                    emailData.updated_on = calendar.timegm(time.gmtime())
-                    emailData.save()
-                    DictData['status'] = 'FAIL'
-                    DictData['response'] = ''
-                    DictData['message'] = 'Please enter correct OTP'
-                    return Response(DictData, status=203)
+                emailId = emailData.email_id
+                emailData.is_verify = True
+                emailData.updated_on = calendar.timegm(time.gmtime())
+                emailData.save()
+                userData = MyUserAccount.objects.get(email=emailId)
+                # userData.is_active = True
+                userData.updated_on = calendar.timegm(time.gmtime())
+                userData.save()
+                DictData['status'] = 'SUCCESS'
+                DictData['response'] = ''
+                DictData['message'] = 'Email verified successfully'
+                return Response(DictData, status=200)
             else:
                 emailData.updated_on = calendar.timegm(time.gmtime())
                 emailData.save()
                 DictData['status'] = 'FAIL'
                 DictData['response'] = ''
-                DictData['message'] = 'OTP is expired'
-                return Response(DictData, status=406)
+                DictData['message'] = 'Email link is expired'
+                return Response(DictData, status=410)
         else:
             DictData['status'] = 'FAIL'
             DictData['response'] = ''
-            DictData['message'] = 'Please enter OTP then send or you are already verified'
-            return Response(DictData, status=406)
+            DictData['message'] = 'Email already verified'
+            return Response(DictData, status=409)
 
 
 @api_view(['POST'])
@@ -124,7 +116,8 @@ def logInUser(request):
         token, created = Token.objects.get_or_create(user=user)
         DictData['status'] = 'SUCCESS'
         DictData['response'] = {}
-        DictData['token'] = token.key
+        DictData['response']['token'] = token.key
+        DictData['response']['userId'] = user.id
         DictData['message'] = 'Login successfully'
         return Response(DictData, status=200)
 
@@ -166,14 +159,15 @@ def getUserProfile(request):
     obj = MyUserAccount.objects.get(id=userId, is_active=True, is_delete=False)
     DictData = {}
     if user == obj:
-        sameUser = True
+        currentUser = True
     else:
-        sameUser = False
+        currentUser = False
     if obj:
         serializer = MyUserAccountProfileSerializer(obj, context={'request': request})
         DictData['status'] = 'SUCCESS'
-        DictData['response'] = serializer.data
-        DictData['response']['sameUser'] = sameUser
+        DictData['response'] = {}
+        DictData['response']['data'] = serializer.data
+        DictData['response']['currentUser'] = currentUser
         DictData['message'] = 'User data send'
         return Response(DictData, status=200)
     else:
@@ -220,29 +214,31 @@ def editUserProfile(request):
     profileChange = request.data['profileChange']
     if profileChange == 'True':
         profilePic = request.FILES['profilePic']
-    profession = request.data['profession']
+    # profession = request.data['profession']
     bio = request.data['bio']
-    contact = request.data['contact']
-    obj = MyUserAccount.objects.get(email=user)
+    # contact = request.data['contact']
+    obj = MyUserAccount.objects.get(email=user, is_delete=False)
     print('obj :::', obj)
     DictData = {}
     if obj:
         print('obj first name ::', obj.first_name)
         obj.first_name = firstName
         obj.last_name = lastName
-        obj.profession = profession
+        # obj.profession = profession
         obj.biography = bio
-        obj.contact = contact
+        # obj.contact = contact
         if profileChange == 'True':
             obj.profile_picture = profilePic
         obj.updated_on = calendar.timegm(time.gmtime())
         obj.save()
+        userObj = MyUserAccount.objects.get(email=user, is_delete=False)
+        serializer = MyUserAccountProfileSerializer(userObj, context={'request': request})
         DictData['status'] = 'SUCCESS'
-        DictData['response'] = ''  # serializer.data
+        DictData['data'] = serializer.data
         DictData['message'] = 'User profile updated'
         return Response(DictData, status=200)
     else:
         DictData['status'] = 'FAIL'
-        DictData['response'] = ''
+        DictData['data'] = ''
         DictData['message'] = 'User profile not updated'
         return Response(DictData, status=406)

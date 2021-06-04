@@ -1,3 +1,4 @@
+from .crypto import encrypt
 from .models import *
 from .serializers import *
 from django.template.loader import render_to_string
@@ -21,14 +22,16 @@ class emailSendService:
     def saveEmail(self, user):
         print('user from email :: ', user)
         token = otpGen()
+        UUID = str(calendar.timegm(time.gmtime()))+str(token)+str(user.id)
         mail_subject = 'Activate your account'
         email_id = user.email
-        message = render_to_string('acc_active_email.html', {'OTP': token, 'email': email_id})
+        message = render_to_string('acc_active_email.html', {'UUID': UUID, 'email': email_id})
         email = emailHandler()
         email.user = user
         email.email_id = email_id
         email.subject = mail_subject
         email.body = message
+        email.uuid = UUID
         email.token = token
         email.created_on = calendar.timegm(time.gmtime())
         email.save()
@@ -38,12 +41,12 @@ class emailSendService:
         t.setDaemon(True)
         t.start()
 
-    def sendEmail(self, email, subject, body):
-        mail = EmailMessage(subject, body, to=[email])
+    def sendEmail(self, email):
+        mail = EmailMessage(email.subject, email.body, to=[email.email_id])
         mail.content_subtype = "html"
         is_sent = mail.send(fail_silently=False)
         if is_sent:
-            emailObj = emailHandler.objects.get(email_id=email)
+            emailObj = emailHandler.objects.get(email_id=email.email_id)
             emailObj.is_sent = True
             emailObj.sent_on = calendar.timegm(time.gmtime())
             emailObj.is_expiry = calendar.timegm(time.gmtime())
@@ -61,6 +64,6 @@ class emailSendService:
     def getEmailData(self):
         emails = emailHandler.objects.filter(is_sent=False, retry_count__lt=10)
         for email in emails:
-            self.sendEmail(email.email_id, email.subject, email.body)
+            self.sendEmail(email)
         time.sleep(5)
 

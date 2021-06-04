@@ -14,7 +14,8 @@ import time
 @permission_classes([IsAuthenticated])
 def allPosts(request):
     key = request.data['search']
-    posts = Post.objects.filter(title__contains=key, is_delete=False).order_by('-id')
+    posts = Post.objects.filter(title__icontains=key, is_delete=False).order_by('-id')
+    print(posts)
     serializer = PostSerializer(posts, context={'request': request}, many=True)
     DictData = {'status': 'SUCCESS', 'response': serializer.data, 'message': 'All Posts sent'}
     return Response(DictData, status=200)
@@ -28,6 +29,18 @@ def myPosts(request):
     posts = Post.objects.filter(created_by=user, is_delete=False).order_by('-id')
     serializer = PostSerializer(posts, context={'request': request}, many=True)
     DictData = {'status': 'SUCCESS', 'response': serializer.data, 'message': 'All Posts sent'}
+    return Response(DictData, status=200)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def userPosts(request):
+    userId = request.data['userId']
+    user = MyUserAccount.objects.get(id=userId, is_delete=False, is_active=True)
+    posts = Post.objects.filter(created_by=user, is_delete=False).order_by('-id')
+    serializer = PostSerializer(posts, context={'request': request}, many=True)
+    DictData = {'status': 'SUCCESS', 'response': serializer.data, 'message': 'User Posts sent'}
     return Response(DictData, status=200)
 
 
@@ -148,10 +161,10 @@ def addComment(request):
         created_on=calendar.timegm(time.gmtime())
     )
     if comment:
-        serializer = CommentSerializer(comment)
+        serializer = CommentSerializer(comment, context={'request': request})
         DictData['status'] = 'SUCCESS'
         DictData['response'] = serializer.data
-        DictData['message'] = 'Comment Created Successfully'
+        DictData['message'] = 'Comment Added Successfully'
         return Response(DictData, status=200)
     else:
         DictData['status'] = 'FAIL'

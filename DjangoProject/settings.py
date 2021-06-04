@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-# from DjangoProject.local.dev import *
+from DjangoProject.local.dev import *
 
-from DjangoProject.prod.prod import *
+# from DjangoProject.prod.prod import *
 
 # Application definition
 

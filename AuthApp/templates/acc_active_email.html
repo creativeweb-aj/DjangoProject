@@ -13,12 +13,13 @@
   <body>
         <div class="alert alert-success" role="alert">
             <h4 class="alert-heading">Activate Your Account!</h4>
-            <p>Please enter OTP to verify your email : {{ email }}. After verify you are able to login. OTP is expire in next 24 hours</p>
-                <div class="card">
-                  <div class="card-body">
-                    {{ OTP }}
-                  </div>
-                </div>
+            <p>Please verify your email : {{ email }}</p>
+            <p>Click on below link to verify your email</p>
+            <div class="card">
+              <div class="card-body">
+                <a href="http://localhost:4200/auth/email/{{UUID}}">Click to Verify</a>
+              </div>
+            </div>
             <hr>
             <p class="mb-0">Thank you!</p>
             <p class="mb-0">Creative web Team</p>
