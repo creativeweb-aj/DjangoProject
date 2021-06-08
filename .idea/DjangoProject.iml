@@ -3,6 +3,9 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/AuthApp/migrations" />
+      <excludeFolder url="file://$MODULE_DIR$/DjangoProject/media" />
+      <excludeFolder url="file://$MODULE_DIR$/PostApp/migrations" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (DjangoProject)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

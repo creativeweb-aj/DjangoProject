@@ -130,6 +130,4 @@ dmypy.json
 AuthApp/migrations
 PostApp/migrations
 
-DjangoProject/local/dev.py
-
 media/
