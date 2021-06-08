@@ -1,0 +1,60 @@
+import os
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get("SECRET_KEY", 'a_eit*qp51vgq0f8c9c@o_nozqrij%n%#(l6!$gy6fguj2sxp!')
+
+ENCRYPT_KEY = os.environ.get("ENCRYPT_KEY", b'2TRwuyTh2qAY3PzZgXU6q8Sqqmdsw_eCvvTG1B_LuYo=')
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'creativeweb',
+        'USER': 'ajay',
+        'PASSWORD': '143136420',
+        'HOST': 'localhost',
+        'PORT': '5432'
+    }
+}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'djangong',
+#         'USER': 'root',
+#         'PASSWORD': '143136420',
+#         'HOST': 'localhost',
+#         'PORT': '3306'
+#     }
+# }
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get("MYAPP_EMAIL_USER", 'ajaysharmadevelopment@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get("MYAPP_EMAIL_PASSWORD", 'dqdaiwwnopvqjidy')
+EMAIL_PORT = 587
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost',
+    'http://192.168.1.42',
+    'http://192.168.1.104',
+    'http://192.168.1.102'
+]
+
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'http://localhost:4200',
+    'http://192.168.1.42:4200',
+    'http://192.168.1.104:4200',
+    'http://192.168.1.102:4200'
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
