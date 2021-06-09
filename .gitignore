@@ -130,4 +130,4 @@ dmypy.json
 AuthApp/migrations
 PostApp/migrations
 
-media/
+media/*

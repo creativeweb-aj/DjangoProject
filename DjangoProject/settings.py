@@ -65,7 +65,7 @@ REST_FRAMEWORK = {
 
 PASSWORDLESS_AUTH = {
     'PASSWORDLESS_AUTH_TYPES': ['EMAIL'],
-    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'ajaysharmadevelopment@gmail.com',
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': os.environ.get('EMAIL_ID'),
 }
 
 AUTH_USER_MODEL = 'AuthApp.MyUserAccount'
