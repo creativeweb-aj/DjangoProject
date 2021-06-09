@@ -10,6 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # from DjangoProject.local.dev import *
 
 from DjangoProject.prod.prod import *
