@@ -98,7 +98,6 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
 .venv
 my.cnf
 env/
@@ -130,4 +129,4 @@ dmypy.json
 AuthApp/migrations
 PostApp/migrations
 
-media/*
+/media/
